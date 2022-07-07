@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserSerializer
-from rest_framework.serializers import Serializer, SerializerMethodField
+from ingredients.models import Ingredient
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from tags.models import Tag
 from users.models import Subscription
 
@@ -15,9 +16,9 @@ class CustomUserSerializer(UserSerializer):
         fields = (
             'email',
             'id',
-            'username', 
-            'first_name', 
-            'last_name', 
+            'username',
+            'first_name',
+            'last_name',
             'password',
             'is_subscribed',
         )
@@ -30,8 +31,15 @@ class CustomUserSerializer(UserSerializer):
         ).exists()
 
 
-class TagSerializer(Serializer):
+class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
+        fields = '__all__'
+        read_only_fields = ('__all__',)
+
+
+class IngredientSerializer(ModelSerializer):
+    class Meta:
+        model = Ingredient
         fields = '__all__'
         read_only_fields = ('__all__',)

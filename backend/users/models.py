@@ -7,10 +7,9 @@ class User(AbstractUser):
     email = models.EmailField('email', unique=True)
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
     USERNAME_FIELD = "email"
-    
+
     class Meta:
-        ordering = ('id',)
-        verbose_name='Пользователь'
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
@@ -32,9 +31,8 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        ordering = ('id',)
-        verbose_name='Подписка'
-        verbose_name_plural='Подписки'
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         constraints = (
             UniqueConstraint(
                 fields=('author', 'subscriber',),

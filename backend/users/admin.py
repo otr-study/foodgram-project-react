@@ -15,5 +15,6 @@ class SubscribtionAdmin(admin.ModelAdmin):
     search_fields = ('author', 'subscriber')
     list_display_links = ('pk', 'author', 'subscriber')
 
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Subscription, SubscribtionAdmin)

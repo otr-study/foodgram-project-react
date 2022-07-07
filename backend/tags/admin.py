@@ -10,4 +10,5 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display_links = ('pk', 'name')
 
+
 admin.site.register(Tag, TagAdmin)
