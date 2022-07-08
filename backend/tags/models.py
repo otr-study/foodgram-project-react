@@ -1,9 +1,14 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200)
-    color = models.CharField(max_length=7, null=True, blank=True)
+    name = models.CharField(max_length=200, unique=True)
+    color = models.CharField(
+        max_length=7,
+        unique=True,
+        validators=(MinValueValidator(7),)
+    )
     slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:

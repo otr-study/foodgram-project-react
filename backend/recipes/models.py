@@ -1,7 +1,6 @@
-from itertools import count
-
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -39,6 +38,12 @@ class TagRecipe(models.Model):
     class Meta:
         verbose_name = 'Связь тэг-рецепт'
         verbose_name_plural = 'Связи тэг-рецепт'
+        constraints = (
+            UniqueConstraint(
+                fields=('tag', 'recipe',),
+                name='unique_tag_recipe'
+            ),
+        )
 
     def __str__(self):
         return f'{self.tag} - {self.recipe}'
@@ -52,6 +57,12 @@ class IngredientRecipe(models.Model):
     class Meta:
         verbose_name = 'Связь ингредиент-рецепт'
         verbose_name_plural = 'Связи ингредиент-рецепт'
+        constraints = (
+            UniqueConstraint(
+                fields=('ingredient', 'recipe',),
+                name='unique_ingredient_recipe'
+            ),
+        )
 
     def __str__(self):
         return f'{self.recipe} - {self.ingredient} ({self.quantity})'
@@ -68,6 +79,12 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
+        constraints = (
+            UniqueConstraint(
+                fields=('user', 'recipe',),
+                name='unique_shoping_cart'
+            ),
+        )
 
     def __str__(self):
         return f'{self.user} {self.recipe}'
@@ -83,6 +100,12 @@ class Favorite(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        constraints = (
+            UniqueConstraint(
+                fields=('user', 'recipe',),
+                name='unique_favorite'
+            ),
+        )
 
     def __str__(self):
         return f'{self.user} {self.recipe}'
