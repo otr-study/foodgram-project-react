@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -11,7 +13,7 @@ class Recipe(models.Model):
     name = models.CharField(max_length=256)
     text = models.TextField()
     image = models.ImageField(upload_to='recipes/')
-    cooking_time = models.SmallIntegerField()
+    cooking_time = models.SmallIntegerField(validators=(MinValueValidator(1),))
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='recipes'
     )

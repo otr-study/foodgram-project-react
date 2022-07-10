@@ -1,5 +1,5 @@
-from django.core.validators import MinValueValidator
 from django.db import models
+from django.core.validators import MinLengthValidator
 
 
 class Tag(models.Model):
@@ -7,7 +7,7 @@ class Tag(models.Model):
     color = models.CharField(
         max_length=7,
         unique=True,
-        validators=(MinValueValidator(7),)
+        validators=(MinLengthValidator(7),)
     )
     slug = models.SlugField(max_length=200, unique=True)
 
