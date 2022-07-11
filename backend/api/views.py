@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -8,19 +9,44 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from tags.models import Tag
 
-from api.serializers import (CustomExtendUserSerializer, FavoriteSerializer,
-                             IngredientSerializer, TagSerializer)
+from .serializers import (CustomExtendUserSerializer, FavoriteSerializer,
+                          IngredientSerializer, SubscriptionSerializer,
+                          TagSerializer)
+from .utils import subscriptions_queryset
+
+User = get_user_model()
 
 
-class ExtendUserViewSet(UserViewSet):
+class ExtendedUserViewSet(UserViewSet):
     @action(detail=False, methods=['GET'])
     def subscriptions(self, request, *args, **kwargs):
-        queryset = super().get_queryset()
-        queryset.select_related(
-            'recipes'
-        ).annotate(recipes_count=Count('recipes__id'))
-        serializer = CustomExtendUserSerializer(queryset, many=True)
+        queryset = subscriptions_queryset(request)
+        context = {'request': request}
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = CustomExtendUserSerializer(
+                page, many=True, context=context
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = CustomExtendUserSerializer(
+            queryset, many=True, context=context
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['POST'])
+    def subscribe(self, request, *args, **kwargs):
+        data = {
+            'user': request.user,
+            'recipe': kwargs.get('recipe_id')
+        }
+        context = {'request': request}
+        serializer = SubscriptionSerializer(
+            data=data, context=context
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

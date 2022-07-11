@@ -4,9 +4,11 @@ from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe
 from rest_framework.serializers import (IntegerField, ModelSerializer,
                                         SerializerMethodField, ValidationError)
-# from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator
 from tags.models import Tag
 from users.models import Subscription
+
+from .utils import subscriptions_queryset
 
 User = get_user_model()
 
@@ -80,5 +82,54 @@ class RecipeShortSerializer(ModelSerializer):
 
 
 class CustomExtendUserSerializer(CustomUserSerializer):
-    resipes = RecipeShortSerializer(many=True)
+    recipes = RecipeShortSerializer(many=True)
     recipes_count = IntegerField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes_count',
+            'recipes',
+        )
+
+class SubscriptionSerializer(ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = ('__all__',)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Subscription.objects.all(),
+                fields=('author', 'subscriber'),
+                message='Дублирование записи.'
+            )
+        ]
+
+    def validate(self, attrs):
+        if attrs['author'] == attrs['subscriber']:
+            raise ValidationError(
+                'Попытка подписаться на самого себя.'
+            )
+        return attrs
+
+    # def validate_author(self, value):
+    #     if self.context.get('request').user == value:
+    #         raise ValidationError(
+    #             'Попытка подписаться на самого себя.'
+    #         )
+    #     return value
+
+    def to_representation(self, instance):
+        request = self.context['request']
+        queryset = subscriptions_queryset(
+            request
+        ).filter(
+            subscriptions_author__author=instance.author
+        )
+        context = {'request': request}
+        return CustomExtendUserSerializer(queryset, context=context).data
