@@ -1,14 +1,15 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from djoser.serializers import UserSerializer
 from ingredients.models import Ingredient
-from recipes.models import Favorite, Recipe
+from recipes.models import Favorite, Recipe, ShoppingCart
 from rest_framework.serializers import (IntegerField, ModelSerializer,
                                         SerializerMethodField, ValidationError)
 from rest_framework.validators import UniqueTogetherValidator
 from tags.models import Tag
 from users.models import Subscription
 
-from .utils import subscriptions_queryset
+from .mixins import CommonSerializerMixin
 
 User = get_user_model()
 
@@ -51,29 +52,6 @@ class IngredientSerializer(ModelSerializer):
         read_only_fields = ('__all__',)
 
 
-class FavoriteSerializer(ModelSerializer):
-    class Meta:
-        model = Favorite
-        fields = ('recipe', 'user',)
-        extra_kwargs = {
-            'recipe': {'required': False},
-            'user': {'required': False}
-        }
-
-    def validate(self, data):
-        request = self.context['request']
-        recipe = self.context['view'].kwargs['recipe_id']
-        if Favorite.objects.filter(
-            user=request.user, recipe__id=recipe
-        ).exists():
-            raise ValidationError('Дублирование записи.')
-        return data
-
-    def to_representation(self, instance):
-        context = {'request': self.context['request']}
-        return RecipeShortSerializer(instance.recipe, context=context).data
-
-
 class RecipeShortSerializer(ModelSerializer):
     class Meta:
         model = Recipe
@@ -81,8 +59,30 @@ class RecipeShortSerializer(ModelSerializer):
         read_only_fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class CustomExtendUserSerializer(CustomUserSerializer):
-    recipes = RecipeShortSerializer(many=True)
+class FavoriteSerializer(CommonSerializerMixin, ModelSerializer):
+    class Meta:
+        to_represent_serializer = RecipeShortSerializer
+        model = Favorite
+        fields = ('recipe', 'user',)
+        extra_kwargs = {
+            'recipe': {'required': False},
+            'user': {'required': False}
+        }
+
+
+class ShoppingCartSerializer(CommonSerializerMixin, ModelSerializer):
+    class Meta:
+        to_represent_serializer = RecipeShortSerializer
+        model = ShoppingCart
+        fields = ('recipe', 'user')
+        extra_kwargs = {
+            'recipe': {'required': False},
+            'user': {'required': False}
+        }
+
+
+class CustomExtendedUserSerializer(CustomUserSerializer):
+    recipes = SerializerMethodField(read_only=True)
     recipes_count = IntegerField(read_only=True)
 
     class Meta:
@@ -98,10 +98,26 @@ class CustomExtendUserSerializer(CustomUserSerializer):
             'recipes',
         )
 
+    @classmethod
+    def get_queryset(cls, request):
+        return User.objects.filter(
+            subscriptions_author__subscriber=request.user
+        ).prefetch_related(
+            'recipes'
+        ).annotate(recipes_count=Count('recipes__id'))
+
+    def get_recipes(self, obj):
+        recipes = obj.recipes.all()
+        request = self.context.get('request')
+        recipes_limit = request.query_params.get('recipes_limit')
+        recipes = recipes_limit and recipes[:int(recipes_limit)] or recipes
+        return RecipeShortSerializer(recipes, many=True).data
+
+
 class SubscriptionSerializer(ModelSerializer):
     class Meta:
         model = Subscription
-        fields = ('__all__',)
+        fields = ('author', 'subscriber')
         validators = [
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),
@@ -117,19 +133,29 @@ class SubscriptionSerializer(ModelSerializer):
             )
         return attrs
 
-    # def validate_author(self, value):
-    #     if self.context.get('request').user == value:
-    #         raise ValidationError(
-    #             'Попытка подписаться на самого себя.'
-    #         )
-    #     return value
-
     def to_representation(self, instance):
         request = self.context['request']
-        queryset = subscriptions_queryset(
-            request
-        ).filter(
+        queryset = CustomExtendedUserSerializer.get_queryset(request)
+        queryset.filter(
             subscriptions_author__author=instance.author
         )
         context = {'request': request}
-        return CustomExtendUserSerializer(queryset, context=context).data
+        return CustomExtendedUserSerializer(queryset[0], context=context).data
+
+
+class RecipeSerializer(ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time'
+        )

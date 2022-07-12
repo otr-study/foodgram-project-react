@@ -6,3 +6,4 @@ sqlparse==0.4.2
 djangorestframework==3.12.4
 django-filter
 djoser
+reportlab==3.6.11
