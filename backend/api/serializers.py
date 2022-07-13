@@ -1,15 +1,16 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Count
 from djoser.serializers import UserSerializer
 from ingredients.models import Ingredient
-from recipes.models import Favorite, Recipe, ShoppingCart
+from recipes.models import Favorite, IngredientRecipe, Recipe, ShoppingCart
 from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        SerializerMethodField, ValidationError)
+                                        PrimaryKeyRelatedField,
+                                        SerializerMethodField,
+                                        SlugRelatedField, ValidationError)
 from rest_framework.validators import UniqueTogetherValidator
 from tags.models import Tag
 from users.models import Subscription
 
-from .mixins import CommonSerializerMixin
+from .mixins import CommonSerializerMixin, QuerySerializerMixin
 
 User = get_user_model()
 
@@ -81,7 +82,9 @@ class ShoppingCartSerializer(CommonSerializerMixin, ModelSerializer):
         }
 
 
-class CustomExtendedUserSerializer(CustomUserSerializer):
+class CustomExtendedUserSerializer(QuerySerializerMixin, CustomUserSerializer):
+    PREFETCH_FIELDS = ['recipes']
+    
     recipes = SerializerMethodField(read_only=True)
     recipes_count = IntegerField(read_only=True)
 
@@ -97,14 +100,6 @@ class CustomExtendedUserSerializer(CustomUserSerializer):
             'recipes_count',
             'recipes',
         )
-
-    @classmethod
-    def get_queryset(cls, request):
-        return User.objects.filter(
-            subscriptions_author__subscriber=request.user
-        ).prefetch_related(
-            'recipes'
-        ).annotate(recipes_count=Count('recipes__id'))
 
     def get_recipes(self, obj):
         recipes = obj.recipes.all()
@@ -143,7 +138,31 @@ class SubscriptionSerializer(ModelSerializer):
         return CustomExtendedUserSerializer(queryset[0], context=context).data
 
 
-class RecipeSerializer(ModelSerializer):
+class IngredientRecipeReadSerializer(ModelSerializer):
+    id = PrimaryKeyRelatedField(source='ingredient', read_only=True)
+    name = SlugRelatedField(
+        slug_field = 'name', source='ingredient', read_only=True
+    )
+    measurement_unit = SlugRelatedField(
+        slug_field='measurement_unit', source='ingredient', read_only=True
+    )
+
+    class Meta:
+        model = IngredientRecipe
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class RecipeReadSerializer(QuerySerializerMixin, ModelSerializer):
+    PREFETCH_FIELDS = ['tags', 'ingredient_recipe']
+    RELATED_FIELDS = ['author']
+
+    tags = TagSerializer(many=True)
+    author = CustomUserSerializer()
+    ingredients = IngredientRecipeReadSerializer(
+        many=True, source='ingredient_recipe'
+    )
+    is_favorited = SerializerMethodField(read_only=True)
+    is_in_shopping_cart = SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -159,3 +178,13 @@ class RecipeSerializer(ModelSerializer):
             'text',
             'cooking_time'
         )
+
+    def get_is_favorited(self, obj):
+        return not obj.is_favorited is None or False
+
+    def get_is_in_shopping_cart(self, obj):
+        return not obj.is_in_shopping_cart is None or False
+
+
+class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
+    ...

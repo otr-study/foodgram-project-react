@@ -2,11 +2,12 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import (ExtendedUserViewSet, FavoriteViewSet, IngredientViewSet,
-                    ShoppingCartViewSet, TagViewSet)
+                    RecipeViewSet, ShoppingCartViewSet, TagViewSet)
 
 router = routers.DefaultRouter()
 router.register('tags', TagViewSet)
 router.register('ingredients', IngredientViewSet)
+router.register('recipes', RecipeViewSet)
 router.register(
     r'recipes/(?P<recipe_id>[\d]+)/favorite',
     FavoriteViewSet

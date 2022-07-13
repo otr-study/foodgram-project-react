@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count, OuterRef, Subquery
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, ShoppingCart
@@ -9,8 +11,11 @@ from rest_framework.response import Response
 from tags.models import Tag
 from users.models import Subscription
 
+from .filters import RecipeFilter
+from .permissions import IsAdmin, IsAuthorOrReadOnly
 from .serializers import (CustomExtendedUserSerializer, FavoriteSerializer,
-                          IngredientSerializer, ShoppingCartSerializer,
+                          IngredientSerializer, RecipeReadSerializer,
+                          RecipeSerializer, ShoppingCartSerializer,
                           SubscriptionSerializer, TagSerializer)
 
 User = get_user_model()
@@ -19,7 +24,11 @@ User = get_user_model()
 class ExtendedUserViewSet(UserViewSet):
     @action(detail=False, methods=['GET'])
     def subscriptions(self, request, *args, **kwargs):
-        queryset = CustomExtendedUserSerializer.get_queryset(request)
+        queryset = User.objects.filter(
+            subscriptions_author__subscriber=request.user
+        ).annotate(recipes_count=Count('recipes__id'))
+        queryset = CustomExtendedUserSerializer.get_related_queries(queryset)
+
         context = {'request': request}
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -122,3 +131,37 @@ class ShoppingCartViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             )
         shoping_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    permission_classes = [IsAuthorOrReadOnly, IsAdmin]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return RecipeReadSerializer
+        return RecipeSerializer
+
+    def get_queryset(self):
+        query_is_favorited = Favorite.objects.filter(
+            user=self.request.user.id,
+            recipe=OuterRef('pk')
+        )
+        query_is_in_shopping_cart = ShoppingCart.objects.filter(
+            user=self.request.user.id,
+            recipe=OuterRef('pk')
+        )
+        queryset = super().get_queryset()
+        serializer = self.get_serializer()
+        queryset = serializer.get_related_queries(queryset)
+        return queryset.annotate(
+            is_favorited=Subquery(
+                query_is_favorited.values('user')[:1]
+            )
+        ).annotate(
+            is_in_shopping_cart=Subquery(
+                query_is_in_shopping_cart.values('user')[:1]
+            )
+        )

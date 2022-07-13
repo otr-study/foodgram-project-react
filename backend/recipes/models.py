@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
-
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -52,9 +51,13 @@ class TagRecipe(models.Model):
 
 
 class IngredientRecipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField()
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, related_name='ingredient_recipe'
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='ingredient_recipe'
+    )
+    amount = models.SmallIntegerField(validators=(MinValueValidator(1),))
 
     class Meta:
         verbose_name = 'Связь ингредиент-рецепт'
@@ -67,7 +70,7 @@ class IngredientRecipe(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe} - {self.ingredient} ({self.quantity})'
+        return f'{self.recipe} - {self.ingredient} ({self.amount})'
 
 
 class ShoppingCart(models.Model):
@@ -94,10 +97,10 @@ class ShoppingCart(models.Model):
 
 class Favorite(models.Model):
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, related_name='favorite'
+        Recipe, on_delete=models.CASCADE, related_name='favorites'
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='favorite'
+        User, on_delete=models.CASCADE, related_name='favorites'
     )
 
     class Meta:
