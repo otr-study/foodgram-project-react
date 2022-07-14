@@ -1,12 +1,20 @@
+import io
+
 from django.contrib.auth import get_user_model
-from django.db.models import Count, OuterRef, Subquery
+from django.db.models import Count, OuterRef, Subquery, Sum
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from foodgram_backend.settings import PDF_FONT
 from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, ShoppingCart
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from tags.models import Tag
 from users.models import Subscription
@@ -145,23 +153,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeSerializer
 
     def get_queryset(self):
-        query_is_favorited = Favorite.objects.filter(
-            user=self.request.user.id,
-            recipe=OuterRef('pk')
-        )
-        query_is_in_shopping_cart = ShoppingCart.objects.filter(
-            user=self.request.user.id,
-            recipe=OuterRef('pk')
-        )
-        queryset = super().get_queryset()
         serializer = self.get_serializer()
-        queryset = serializer.get_related_queries(queryset)
-        return queryset.annotate(
-            is_favorited=Subquery(
-                query_is_favorited.values('user')[:1]
-            )
+        queryset = serializer.get_initial_queryset(self.request)
+        return serializer.get_related_queries(queryset)
+
+    @action(
+        detail=False, methods=['GET'], permission_classes=[IsAuthenticated]
+    )
+    def download_shopping_cart(self, request, *args, **kwargs):
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer)
+        font_object = TTFont('Arial', PDF_FONT)
+        pdfmetrics.registerFont(font_object)
+        pdf.setFont('Arial', size=16)
+
+        shoping_cart = Ingredient.objects.filter(
+            ingredient_recipe__recipe__shoping_cart__user=request.user
         ).annotate(
-            is_in_shopping_cart=Subquery(
-                query_is_in_shopping_cart.values('user')[:1]
-            )
+            amount=Sum('ingredient_recipe__amount')
+        ).values_list('name', 'measurement_unit', 'amount')
+
+        for i, (name, measurement_unit, amount) in enumerate(shoping_cart, 1):
+            item = f'{i}. {name}: {amount}{measurement_unit}'
+            pdf.drawString(50, 775 - i * 25, item)
+
+        pdf.showPage()
+        pdf.save()
+
+        buffer.seek(0)
+        return FileResponse(
+            buffer, as_attachment=True, filename='shopping_cart.pdf'
         )
