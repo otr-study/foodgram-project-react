@@ -1,7 +1,7 @@
 import io
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, OuterRef, Subquery, Sum
+from django.db.models import Count, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -154,8 +154,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         serializer = self.get_serializer()
-        queryset = serializer.get_initial_queryset(self.request)
-        return serializer.get_related_queries(queryset)
+        return serializer.get_queryset(self.request)
 
     @action(
         detail=False, methods=['GET'], permission_classes=[IsAuthenticated]
