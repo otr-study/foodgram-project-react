@@ -20,7 +20,7 @@ from tags.models import Tag
 from users.models import Subscription
 
 from .filters import RecipeFilter
-from .permissions import IsAdmin, IsAuthorOrReadOnly
+from .permissions import IsAdmin, IsAuthorOrReadOnlyOrAdmin
 from .serializers import (CustomExtendedUserSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeReadSerializer,
                           RecipeSerializer, ShoppingCartSerializer,
@@ -143,7 +143,7 @@ class ShoppingCartViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = [IsAuthorOrReadOnly, IsAdmin]
+    permission_classes = [IsAuthorOrReadOnlyOrAdmin]
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
 

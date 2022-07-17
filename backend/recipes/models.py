@@ -22,9 +22,10 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe', related_name='recipes'
     )
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 

@@ -59,10 +59,15 @@ class IngredientSerializer(ModelSerializer):
 
 
 class RecipeShortSerializer(ModelSerializer):
+    image = SerializerMethodField(read_only=True)
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = ('id', 'name', 'image', 'cooking_time')
+
+    def get_image(self, obj):
+        return obj.image.url
 
 
 class FavoriteSerializer(CommonSerializerMixin, ModelSerializer):
@@ -204,6 +209,7 @@ class RecipeReadSerializer(QuerySerializerMixin, ModelSerializer):
     )
     is_favorited = SerializerMethodField(read_only=True)
     is_in_shopping_cart = SerializerMethodField(read_only=True)
+    image = SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -219,6 +225,9 @@ class RecipeReadSerializer(QuerySerializerMixin, ModelSerializer):
             'text',
             'cooking_time'
         )
+
+    def get_image(self, obj):
+        return obj.image.url
 
     def get_is_favorited(self, obj):
         return obj.is_favorited is not None or False
@@ -287,7 +296,7 @@ class RecipeSerializer(ModelSerializer):
         ]
         if len(values) != len(set(values)):
             raise ValidationError(
-                f'Поле "{field_name}" должно содержить неуникальные значения'
+                f'Поле "{field_name}" должно содержить уникальные значения'
             )
 
     @transaction.atomic
