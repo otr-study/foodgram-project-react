@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+
 from ingredients.models import Ingredient
 from tags.models import Tag
 
@@ -16,9 +17,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='recipes'
     )
-    tags = models.ManyToManyField(
-        Tag, through='TagRecipe', related_name='recipes'
-    )
+    tags = models.ManyToManyField(Tag, related_name='recipes')
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe', related_name='recipes'
     )
@@ -31,24 +30,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class TagRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Связь тэг-рецепт'
-        verbose_name_plural = 'Связи тэг-рецепт'
-        constraints = (
-            UniqueConstraint(
-                fields=('tag', 'recipe',),
-                name='unique_tag_recipe'
-            ),
-        )
-
-    def __str__(self):
-        return f'{self.tag} - {self.recipe}'
 
 
 class IngredientRecipe(models.Model):
@@ -71,7 +52,7 @@ class IngredientRecipe(models.Model):
         )
 
     def __str__(self):
-        return f'{self.recipe} - {self.ingredient} ({self.amount})'
+        return f'{self.recipe.name} - {self.ingredient.name} ({self.amount})'
 
 
 class ShoppingCart(models.Model):
@@ -93,7 +74,7 @@ class ShoppingCart(models.Model):
         )
 
     def __str__(self):
-        return f'{self.user} {self.recipe}'
+        return f'{self.user.username} {self.recipe.name}'
 
 
 class Favorite(models.Model):
@@ -114,4 +95,4 @@ class Favorite(models.Model):
         )
 
     def __str__(self):
-        return f'{self.user} {self.recipe}'
+        return f'{self.user.username} {self.recipe.name}'

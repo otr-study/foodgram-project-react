@@ -1,14 +1,11 @@
 import io
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Sum
+from django.db.models import Count, OuterRef, Subquery, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from foodgram_backend.settings import PDF_FONT
-from ingredients.models import Ingredient
-from recipes.models import Favorite, Recipe, ShoppingCart
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -16,15 +13,20 @@ from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from tags.models import Tag
-from users.models import Subscription
+
+from foodgram_backend.settings import PDF_FONT
 
 from .filters import RecipeFilter
-from .permissions import IsAdmin, IsAuthorOrReadOnlyOrAdmin
-from .serializers import (CustomExtendedUserSerializer, FavoriteSerializer,
-                          IngredientSerializer, RecipeReadSerializer,
-                          RecipeSerializer, ShoppingCartSerializer,
-                          SubscriptionSerializer, TagSerializer)
+from .permissions import IsAuthorOrReadOnlyOrAdmin
+from .serializers import (
+    CustomExtendedUserSerializer, FavoriteSerializer, IngredientSerializer,
+    RecipeReadSerializer, RecipeSerializer, ShoppingCartSerializer,
+    SubscriptionSerializer, TagSerializer,
+)
+from ingredients.models import Ingredient
+from recipes.models import Favorite, Recipe, ShoppingCart
+from tags.models import Tag
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -153,8 +155,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeSerializer
 
     def get_queryset(self):
+        request = self.request
         serializer = self.get_serializer()
-        return serializer.get_queryset(self.request)
+        query_is_favorited = Favorite.objects.filter(
+            user=request.user.id,
+            recipe=OuterRef('pk')
+        )
+        query_is_in_shopping_cart = ShoppingCart.objects.filter(
+            user=request.user.id,
+            recipe=OuterRef('pk')
+        )
+        queryset = Recipe.objects.all().annotate(
+            is_favorited=Subquery(
+                query_is_favorited.values('user')[:1]
+            )
+        ).annotate(
+            is_in_shopping_cart=Subquery(
+                query_is_in_shopping_cart.values('user')[:1]
+            )
+        )
+        return serializer.get_related_queries(queryset)
 
     @action(
         detail=False, methods=['GET'], permission_classes=[IsAuthenticated]

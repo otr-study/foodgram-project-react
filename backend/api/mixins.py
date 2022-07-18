@@ -4,7 +4,7 @@ from rest_framework.serializers import SerializerMethodField, ValidationError
 class CommonSerializerMixin:
     def to_representation(self, instance):
         context = {'request': self.context['request']}
-        return self.Meta.to_represent_serializer(
+        return self.to_represent_serializer(
             instance.recipe, context=context
         ).data
 
