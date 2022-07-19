@@ -130,3 +130,12 @@ dmypy.json
 
 # .idea
 .idea
+
+# IDE
+.vscode/
+
+# Front
+node_modules/
+
+# static
+media/
