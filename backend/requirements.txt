@@ -8,3 +8,4 @@ django-filter
 djoser
 reportlab==3.6.11
 drf-extra-fields
+python-dotenv==0.20.0

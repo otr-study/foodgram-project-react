@@ -221,16 +221,12 @@ class RecipeReadSerializer(QuerySerializerMixin, ModelSerializer):
         return obj.image.url
 
     def get_is_favorited(self, obj):
-        if hasattr(obj, 'is_favorited'):
-            return obj.is_favorited is not None
         request = self.context['request']
         return Favorite.objects.filter(
             recipe=obj, user=request.user
         ).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        if hasattr(obj, 'is_in_shopping_cart'):
-            return obj.is_in_shopping_cart is not None
         request = self.context['request']
         return ShoppingCart.objects.filter(
             recipe=obj, user=request.user

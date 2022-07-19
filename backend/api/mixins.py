@@ -1,4 +1,4 @@
-from rest_framework.serializers import SerializerMethodField, ValidationError
+from rest_framework.serializers import ValidationError
 
 
 class CommonSerializerMixin:
