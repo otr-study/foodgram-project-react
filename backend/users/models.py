@@ -6,7 +6,7 @@ from django.db.models.constraints import UniqueConstraint
 class User(AbstractUser):
     email = models.EmailField('email', unique=True)
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = 'email'
 
     class Meta:
         verbose_name = 'Пользователь'

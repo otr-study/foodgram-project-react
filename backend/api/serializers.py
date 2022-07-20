@@ -75,10 +75,7 @@ class FavoriteSerializer(CommonSerializerMixin, ModelSerializer):
     class Meta:
         model = Favorite
         fields = ('recipe', 'user',)
-        extra_kwargs = {
-            'recipe': {'required': False},
-            'user': {'required': False}
-        }
+        read_only_fields = ('recipe', 'user')
 
 
 class ShoppingCartSerializer(CommonSerializerMixin, ModelSerializer):
@@ -87,10 +84,7 @@ class ShoppingCartSerializer(CommonSerializerMixin, ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = ('recipe', 'user')
-        extra_kwargs = {
-            'recipe': {'required': False},
-            'user': {'required': False}
-        }
+        read_only_fields = ('recipe', 'user')
 
 
 class CustomExtendedUserSerializer(QuerySerializerMixin, CustomUserSerializer):
@@ -303,7 +297,9 @@ class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
 
     @staticmethod
     def validate_save_ingredients(ingredients, recipe, is_update=False):
-        [item.update({'recipe': recipe.id}) for item in ingredients]
+        for item in ingredients:
+            item.update({'recipe': recipe.id})
+
         nested_ingredients_serializer = IngredientRecipeSerializer(
             data=ingredients, many=True
         )
