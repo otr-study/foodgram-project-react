@@ -37,5 +37,16 @@
 http://84.252.137.183/api/docs/
 ```
 
+## Тестирование
+
+Сервис доступен по адресу:
+```
+http://84.252.137.183/api/docs/
+```
+Учетные данные для входа в формате email:password
+    - superuser@mail.com:123
+    - popovich@mail.com:4t2zG7a3
+    - muromec@mail.com:IKQy8Ztm
+    - nicitich@mail.com:Ca#aoZ12
 ## Автор
 [@otr-study](https://github.com/otr-study)
