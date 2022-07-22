@@ -68,7 +68,6 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          copy_stack_file: true
           script: |
             sudo docker compose stop
             sudo docker compose rm web --force 2>/dev/null
