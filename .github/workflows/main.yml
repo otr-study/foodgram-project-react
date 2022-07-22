@@ -70,7 +70,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            cp .env infra/.env      
             cd infra      
             rm .env 2>/dev/null
             touch .env
