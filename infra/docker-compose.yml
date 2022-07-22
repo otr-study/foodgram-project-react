@@ -7,6 +7,13 @@ services:
     env_file:
       - ./.env
 
+  frontend:
+    image: otrstudy/foodgram_frontend:latest
+    volumes:
+      - ../frontend/:/app/result_build/
+    depends_on:
+      - db
+
   web:
     image: otrstudy/foodgram:diplom     
     restart: always
@@ -14,7 +21,7 @@ services:
       - static_value:/app/static_backend/
       - media_value:/app/media_backend/
     depends_on:
-      - db
+      - frontend
     env_file:
       - ./.env
 
