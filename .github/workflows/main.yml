@@ -72,6 +72,7 @@ jobs:
           envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           envkey_DB_HOST: ${{ secrets.DB_HOST }}
           envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          file_name: .env
 
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
