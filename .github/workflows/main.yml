@@ -59,12 +59,13 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "infra/docker-compose.yml"
+          source: "infra/*"
           target: "~/"
 
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v1.3
         with:
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
           envkey_DB_ENGINE: ${{ secrets.DB_ENGINE }}
           envkey_DB_NAME: ${{ secrets.DB_NAME }}
           envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
@@ -80,6 +81,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
+            cd infra      
             sudo docker compose stop
             sudo docker compose rm web --force 2>/dev/null
             sudo docker rmi otrstudy/web --force 2>/dev/null
