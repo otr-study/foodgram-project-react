@@ -81,10 +81,9 @@ jobs:
             echo DB_HOST: ${{ secrets.DB_HOST }} >> .env
             echo DB_PORT: ${{ secrets.DB_PORT }} >> .env
             sudo docker compose stop
-            sudo docker compose down -v
-            sudo docker rmi otrstudy/web --force 2>/dev/null
+            sudo docker compose rm web --force 2>/dev/null
+            sudo docker rmi  otrstudy/foodgram:diplom --force 2>/dev/null
             sudo docker compose up -d
             sudo docker compose exec web python manage.py makemigrations
             sudo docker compose exec web python manage.py migrate
             sudo docker compose exec web python manage.py collectstatic --no-input
-            sudo docker compose exec web python manage.py load_ingredients_json data/ingredients.json
