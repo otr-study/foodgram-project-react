@@ -24,6 +24,7 @@ jobs:
 
     - name: Test with flake8
       run: |
-        python -m flake8 --ignore=W503,F811,R504 --exclude=*/migrations/,manage.py --per-file-ignores=*/settings.py:E501 backend
+              # python -m flake8 --ignore=W503,F811,R504 --exclude=*/migrations/,manage.py --per-file-ignores=*/settings.py:E501 backend
+        python -m flake8 --config=backend/setup.cfg backend
 
 
