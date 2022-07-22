@@ -1,4 +1,4 @@
-[comment]: <> ![api_yamdb workflow](https://github.com/otr-study/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+[![Django-app workflow](https://github.com/otr-study/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/otr-study/foodgram-project-react/actions/workflows/main.yml)
 # Foodgram
 Бэкенд приложения «Продуктовый помощник»: сайт, на котором пользователи публикуют рецепты, добавляют чужие рецепты в избранное и подписываются на публикации других авторов. Сервис «Список покупок» позволяет пользователям создавать список продуктов, которые нужно купить для приготовления выбранных блюд. 
 
@@ -28,7 +28,7 @@
 - Для доступа к админке не забудьте создать суперюзера
 `$ docker-compose exec web python manage.py createsuperuser`
 - Для загруки ингридиентов примените команду
-`$ docker-compose exec web python manage.py load_ingredients_json /foodgram-project-react/data/ingredients.json`
+`$ docker-compose exec web python manage.py load_ingredients_json data/ingredients.json`
 
 ## Документация API
 

@@ -70,7 +70,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker compose stop
-            sudo docker compose rm web --force
+            sudo docker compose rm web --force 2>/dev/null
             sudo docker rmi otrstudy/web --force 2>/dev/null
             sudo docker compose up -d
             sudo docker compose exec web python manage.py makemigrations
