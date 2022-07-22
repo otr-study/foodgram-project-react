@@ -65,6 +65,7 @@ jobs:
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v1.3
         with:
+          file_name: infra/.env
           envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
           envkey_DB_ENGINE: ${{ secrets.DB_ENGINE }}
           envkey_DB_NAME: ${{ secrets.DB_NAME }}
