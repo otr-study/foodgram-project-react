@@ -275,6 +275,13 @@ class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
             )
         return data
 
+    @staticmethod
+    def validate_empty_fiels(data, field_name):
+        if len([value for value in data if not data[field_name]]):
+            raise ValidationError(
+                f'Пустое значение в поле "{field_name}"'
+            )
+
     @transaction.atomic
     def create(self, validated_data):
         user = self.context['request'].user

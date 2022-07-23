@@ -4,12 +4,12 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import IngredientSearchFilter, RecipeFilter
 from .permissions import IsAuthorOrReadOnlyOrAdmin
 from .serializers import (
     CustomExtendedUserSerializer, FavoriteSerializer, IngredientSerializer,
@@ -26,7 +26,11 @@ User = get_user_model()
 
 
 class ExtendedUserViewSet(UserViewSet):
-    @action(detail=False, methods=['GET'])
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    @action(
+        detail=False, methods=['GET'], permissions=[permissions.AllowAny]
+    )
     def subscriptions(self, request, *args, **kwargs):
         queryset = User.objects.filter(
             subscriptions_author__subscriber=request.user
@@ -87,7 +91,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (permissions.AllowAny,)
     pagination_class = None
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)
 
 
