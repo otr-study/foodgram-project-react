@@ -247,9 +247,10 @@ class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
         read_only_fields = ('author', 'tags', 'ingredients')
 
     def validate(self, data):
-        data['ingredients'] = self.validate_m2m_field(
+        ingredients = self.validate_m2m_field(
             self.initial_data, 'ingredients'
         )
+        data['ingredients'] = self.validate_empty_field(ingredients, 'amount')
         data['tags'] = self.validate_m2m_field(self.initial_data, 'tags')
         return data
 
@@ -276,11 +277,12 @@ class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
         return data
 
     @staticmethod
-    def validate_empty_fiels(data, field_name):
+    def validate_empty_field(data, field_name):
         if len([value for value in data if not data[field_name]]):
             raise ValidationError(
                 f'Пустое значение в поле "{field_name}"'
             )
+        return data
 
     @transaction.atomic
     def create(self, validated_data):
