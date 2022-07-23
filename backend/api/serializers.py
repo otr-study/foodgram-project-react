@@ -278,7 +278,9 @@ class RecipeSerializer(QuerySerializerMixin, ModelSerializer):
 
     @staticmethod
     def validate_empty_field(data, field_name):
-        if len([value for value in data if not data[field_name]]):
+        if len(
+            [item[field_name] for item in data if not int(item[field_name])]
+        ):
             raise ValidationError(
                 f'Пустое значение в поле "{field_name}"'
             )
