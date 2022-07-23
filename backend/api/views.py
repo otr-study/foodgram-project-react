@@ -29,7 +29,8 @@ class ExtendedUserViewSet(UserViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     @action(
-        detail=False, methods=['GET'], permissions=[permissions.AllowAny]
+        detail=False, methods=['GET'],
+        permission_classes=(permissions.AllowAny,)
     )
     def subscriptions(self, request, *args, **kwargs):
         queryset = User.objects.filter(
