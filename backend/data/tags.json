@@ -1,0 +1,32 @@
+[
+	{
+		"name": "Суп",
+		"slug": "soup",
+		"color": "#E26C2D"
+	},
+	{
+		"name": "Коктейль",
+		"slug": "coctail",
+		"color": "#0000F5"
+	},
+	{
+		"name": "Каша",
+		"slug": "porridge",
+		"color": "#FFF500"
+	},
+	{
+		"name": "Напиток",
+		"slug": "drink",
+		"color": "#FFD1F5"
+	},
+	{
+		"name": "Завтрак",
+		"slug": "breakfast",
+		"color": "#FFB455"
+	},
+	{
+		"name": "Ужин",
+		"slug": "dinner",
+		"color": "#55CC80"
+	}
+]

@@ -13,10 +13,10 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://*localhost',
-    'http://*127.0.0.1',
-    'http://84.252.137.183',
-    'http://84.252.137.183:8080'
+    'http://localhost*',
+    'http://127.0.0.1*',
+    'http://84.252.137.183*',
+    # 'http://84.252.137.183:8080'
 ]
 
 

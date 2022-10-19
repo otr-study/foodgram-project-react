@@ -29,6 +29,8 @@
 `$ docker-compose exec web python manage.py createsuperuser`
 - Для загруки ингридиентов примените команду
 `$ docker-compose exec web python manage.py load_ingredients_json data/ingredients.json`
+- Для загруки тэгов примените команду
+`$ docker-compose exec web python manage.py load_tags_json data/tags.json`
 
 ## Документация API
 
