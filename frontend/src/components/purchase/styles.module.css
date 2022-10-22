@@ -24,8 +24,8 @@
 }
 
 .recipeLink {
-  color: #000;
-  text-decoration: none;
+    color: var(--mainfontcolor);
+    text-decoration: none;
 }
 
 .purchase:last-child {
@@ -36,7 +36,7 @@
     display: grid;
     position: relative;
     grid-template-areas: 'image title'
-    'image text';
+        'image text';
     justify-content: space-between;
     column-gap: 50px;
 }
@@ -58,7 +58,7 @@
     font-size: 14px;
     line-height: 17px;
     max-width: 300px;
-    color: #000;
+    color: var(--mainfontcolor);
     grid-area: text;
     align-self: start;
     margin: 0 0 28px;
@@ -85,4 +85,3 @@
     margin: 10px 0 13px;
     grid-area: title;
 }
-

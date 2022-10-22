@@ -23,25 +23,25 @@
 }
 
 .button_style_light {
-  border: 1px solid #DEE2F2;
-  background: #FFF;
-  color: #4A61DD;
+  border: var(--card-button-border);
+  background: var(--card-button-background);
+  color: var(--hightlightcolor);
 }
 
 .button_style_light:hover {
-  background: #D8DEFF;
-  color: #4A61DD;
-  border: 1px solid transparent;
+  background: var(--card-button-background-hover);
+  color: var(--hightlightcolor);
+  border: var(--card-button-border);
 }
 
 .button_style_light-blue {
-  background: #F0F3FF;
-  color: #4A61DD;
+  background: var(--card-button-background);
+  color: var(--hightlightcolor);
+  border: var(--card-button-border);
 }
 
 .button_style_light-blue:hover {
-  background: #D8DEFF;
-  color: #4A61DD;
+  background: var(--card-button-background-hover);
 }
 
 .button_style_dark-blue {
@@ -69,7 +69,7 @@
 
 @media screen and (max-width: 940px) {
   .button {
-    font-size: 12px!important;
+    font-size: 12px !important;
     padding: 0px 12px;
     height: 32px;
     line-height: 30px;

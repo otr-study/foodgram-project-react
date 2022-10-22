@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   max-width: 363px;
-  border: 1px solid #EEEEEE;
+  border: 1px solid var(--bordercolor);
   box-sizing: border-box;
   border-radius: 8px;
   overflow: hidden;
@@ -11,8 +11,8 @@
 
 .card__add {
   display: flex;
-  font-size: 14px!important;
-  font-weight: 600!important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
   align-items: center;
 }
 
@@ -26,32 +26,34 @@
 }
 
 .card__link {
-  color: #000;
+  color: var(--mainfontcolor);
 }
 
 .card__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 24px 32px;
-    flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px 32px;
+  flex: 0 0 auto;
 }
 
 .card__item {
-    margin-right: 8px;
+  margin-right: 8px;
 }
+
 .card__text {
-    font-family: 'Montserrat', sans-serif;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 17px;
-    color: #000;
-    margin: 0 0 15px;
-    padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--mainfontcolor);
+  margin: 0 0 15px;
+  padding: 0;
 }
+
 .card__text:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .card__image {
@@ -67,7 +69,7 @@
   font-weight: bold;
   font-size: 20px;
   line-height: 24px;
-  color: #000000;
+  color: var(--titlefontcolor);
   margin: 0 0 12px;
   padding: 0;
   display: block;
@@ -110,4 +112,3 @@
     max-width: 100%;
   }
 }
-

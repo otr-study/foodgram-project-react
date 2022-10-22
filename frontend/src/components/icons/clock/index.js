@@ -1,4 +1,9 @@
+import { ThemeContext } from '../../../contexts';
+import { useContext } from 'react'
+
 const ClockIcon = (props) => {
+  const themeContext = useContext(ThemeContext);
+
   return (
     <svg
       width={20}
@@ -9,13 +14,13 @@ const ClockIcon = (props) => {
     >
       <path
         d="M10 18.333a8.333 8.333 0 100-16.666 8.333 8.333 0 000 16.666z"
-        stroke="#000"
+        stroke={themeContext === 'light' ? "#000" : "#fff"}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M10 5v5l2.5 2.5"
-        stroke="#000"
+        stroke={themeContext === 'light' ? "#000" : "#fff"}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

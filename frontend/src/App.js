@@ -7,6 +7,7 @@ import api from './api'
 import styles from './styles.module.css'
 import cn from 'classnames'
 import hamburgerImg from './images/hamburger-menu.png'
+import { getCurrentTheme, useThemeState } from './utils/theme-switcher';
 
 import {
   Main,
@@ -22,14 +23,15 @@ import {
   ChangePassword
 } from './pages'
 
-import { AuthContext, UserContext } from './contexts'
+import { AuthContext, UserContext, ThemeContext } from './contexts'
 
 function App() {
-  const [ loggedIn, setLoggedIn ] = useState(null)
-  const [ user, setUser ] = useState({})
-  const [ loading, setLoading ] = useState(false)
-  const [ orders, setOrders ] = useState(0)
-  const [ menuToggled, setMenuToggled ] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(null)
+  const [user, setUser] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [orders, setOrders] = useState(0)
+  const [menuToggled, setMenuToggled] = useState(false)
+  const [theme, setTheme] = useThemeState('light');
   const location = useLocation()
 
   const registration = ({
@@ -90,13 +92,13 @@ function App() {
         setLoggedIn(false)
       }
     })
-    .catch(err => {
-      const errors = Object.values(err)
-      if (errors) {
-        alert(errors.join(', '))
-      }
-      setLoggedIn(false)
-    })
+      .catch(err => {
+        const errors = Object.values(err)
+        if (errors) {
+          alert(errors.join(', '))
+        }
+        setLoggedIn(false)
+      })
   }
 
   const loadSingleItem = ({ id, callback }) => {
@@ -120,6 +122,16 @@ function App() {
         }
       })
   }
+
+  const onThemeSwitch = () => {
+    console.log(getCurrentTheme());
+    const currentTheme = getCurrentTheme() === 'light' ? 'dark' : 'light';
+    setTheme(currentTheme);
+  }
+
+  useEffect(() => {
+    setTheme(getCurrentTheme());
+  }, []);
 
   useEffect(_ => {
     if (loggedIn) {
@@ -168,107 +180,109 @@ function App() {
   if (loggedIn === null) {
     return <div className={styles.loading}>Loading!!</div>
   }
-  
+
   return <AuthContext.Provider value={loggedIn}>
     <UserContext.Provider value={user}>
-      <div className={cn("App", {
-        [styles.appMenuToggled]: menuToggled
-      })}>
-        <div
-          className={styles.menuButton}
-          onClick={_ => setMenuToggled(!menuToggled)}
-        >
-          <img src={hamburgerImg} />
-        </div>
-        <Header orders={orders} loggedIn={loggedIn} onSignOut={onSignOut} />
-        <Switch>
-          <ProtectedRoute
-            exact
-            path='/user/:id'
-            component={User}
-            loggedIn={loggedIn}
-            updateOrders={updateOrders}
-          />
-          <ProtectedRoute
-            exact
-            path='/cart'
-            component={Cart}
-            orders={orders}
-            loggedIn={loggedIn}
-            updateOrders={updateOrders}
-          />
-          <ProtectedRoute
-            exact
-            path='/subscriptions'
-            component={Subscriptions}
-            loggedIn={loggedIn}
-          />
-
-          <ProtectedRoute
-            exact
-            path='/favorites'
-            component={Favorites}
-            loggedIn={loggedIn}
-            updateOrders={updateOrders}
-          />
-
-          <ProtectedRoute
-            exact
-            path='/recipes/create'
-            component={RecipeCreate}
-            loggedIn={loggedIn}
-          />
-
-          <ProtectedRoute
-            exact
-            path='/recipes/:id/edit'
-            component={RecipeEdit}
-            loggedIn={loggedIn}
-            loadItem={loadSingleItem}
-            onItemDelete={getOrders}
-          />
-          <ProtectedRoute
-            exact
-            path='/change-password'
-            component={ChangePassword}
-            loggedIn={loggedIn}
-            onPasswordChange={changePassword}
-          />
-
-          <Route
-            exact
-            path='/recipes/:id'
+      <ThemeContext.Provider value={theme}>
+        <div className={cn("App", {
+          [styles.appMenuToggled]: menuToggled
+        })}>
+          <div
+            className={styles.menuButton}
+            onClick={_ => setMenuToggled(!menuToggled)}
           >
-            <SingleCard
+            <img src={hamburgerImg} />
+          </div>
+          <Header orders={orders} loggedIn={loggedIn} onSignOut={onSignOut} />
+          <Switch>
+            <ProtectedRoute
+              exact
+              path='/user/:id'
+              component={User}
+              loggedIn={loggedIn}
+              updateOrders={updateOrders}
+            />
+            <ProtectedRoute
+              exact
+              path='/cart'
+              component={Cart}
+              orders={orders}
+              loggedIn={loggedIn}
+              updateOrders={updateOrders}
+            />
+            <ProtectedRoute
+              exact
+              path='/subscriptions'
+              component={Subscriptions}
+              loggedIn={loggedIn}
+            />
+
+            <ProtectedRoute
+              exact
+              path='/favorites'
+              component={Favorites}
+              loggedIn={loggedIn}
+              updateOrders={updateOrders}
+            />
+
+            <ProtectedRoute
+              exact
+              path='/recipes/create'
+              component={RecipeCreate}
+              loggedIn={loggedIn}
+            />
+
+            <ProtectedRoute
+              exact
+              path='/recipes/:id/edit'
+              component={RecipeEdit}
               loggedIn={loggedIn}
               loadItem={loadSingleItem}
-              updateOrders={updateOrders}
+              onItemDelete={getOrders}
             />
-          </Route>
+            <ProtectedRoute
+              exact
+              path='/change-password'
+              component={ChangePassword}
+              loggedIn={loggedIn}
+              onPasswordChange={changePassword}
+            />
 
-          <Route exact path='/recipes'>
-            <Main
-              updateOrders={updateOrders}
-            />
-          </Route>
+            <Route
+              exact
+              path='/recipes/:id'
+            >
+              <SingleCard
+                loggedIn={loggedIn}
+                loadItem={loadSingleItem}
+                updateOrders={updateOrders}
+              />
+            </Route>
+
+            <Route exact path='/recipes'>
+              <Main
+                updateOrders={updateOrders}
+              />
+            </Route>
 
 
-          <Route exact path='/signin'>
-            <SignIn
-              onSignIn={authorization}
-            />
-          </Route>
-          <Route exact path='/signup'>
-            <SignUp
-              onSignUp={registration}
-            />
-          </Route>
-          <Route path='/'>
-            {loggedIn ? <Redirect to='/recipes' /> : <Redirect to='/signin'/>}
-          </Route>
-        </Switch>
-        <Footer />
-      </div>
+            <Route exact path='/signin'>
+              <SignIn
+                onSignIn={authorization}
+              />
+            </Route>
+            <Route exact path='/signup'>
+              <SignUp
+                onSignUp={registration}
+              />
+            </Route>
+            <Route path='/'>
+              {loggedIn ? <Redirect to='/recipes' /> : <Redirect to='/signin' />}
+            </Route>
+          </Switch>
+          <Footer onThemeSwitch={onThemeSwitch} />
+        </div>
+      </ThemeContext.Provider>
     </UserContext.Provider>
   </AuthContext.Provider>
 }

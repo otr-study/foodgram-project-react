@@ -3,10 +3,15 @@ import cn from 'classnames'
 import { LinkComponent, Icons } from '../index'
 import arrowLeft from './arrow-left.png'
 import arrowRight from './arrow-right.png'
+import arrowLeftLight from './arrow-left-light.png'
+import arrowRightLight from './arrow-right-light.png'
 import { useState, useEffect } from 'react'
+import { ThemeContext } from '../../contexts';
+import { useContext } from 'react'
 
 const Pagination = ({ count = 0, limit = 6, initialActive = 1, onPageChange, page }) => {
-  const [ active, setActive ] = useState(initialActive)
+  const themeContext = useContext(ThemeContext);
+  const [active, setActive] = useState(initialActive)
   const onButtonClick = (active) => {
     setActive(active)
     onPageChange(active)
@@ -26,7 +31,7 @@ const Pagination = ({ count = 0, limit = 6, initialActive = 1, onPageChange, pag
           [styles.arrowDisabled]: active === 1
         }
       )}
-      src={arrowLeft}
+      src={themeContext === 'light' ? arrowLeft : arrowLeftLight}
       onClick={_ => {
         if (active === 1) { return }
         onButtonClick(active - 1)
@@ -36,15 +41,15 @@ const Pagination = ({ count = 0, limit = 6, initialActive = 1, onPageChange, pag
       return <div
         className={cn(
           styles.paginationItem, {
-            [styles.paginationItemActive]: idx + 1 === active
-          }
+          [styles.paginationItemActive]: idx + 1 === active
+        }
         )}
         onClick={_ => onButtonClick(idx + 1)}
         key={idx}
       >{idx + 1}</div>
     })}
     <img
-      src={arrowRight}
+      src={themeContext === 'light' ? arrowRight : arrowRightLight}
       className={cn(
         styles.arrow,
         styles.arrowRight,

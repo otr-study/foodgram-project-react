@@ -20,7 +20,7 @@
   width: 182px;
   cursor: pointer;
   height: 48px;
-  background: #DEDEDE;
+  background: var(--button-background);
   border-radius: 6px;
   font-size: 18px;
   font-weight: 400;

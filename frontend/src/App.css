@@ -2,6 +2,8 @@
   text-align: center;
   position: relative;
   transition: transform .3s;
+  background-color: var(--background-color);
+  color: var(--mainfontcolor);
 }
 
 .App-logo {
@@ -38,6 +40,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -48,10 +51,47 @@
 * {
   box-sizing: border-box;
 }
+
 html,
 body {
   font-family: Montserrat, Arial, sans-serif;
   min-height: 100%;
   padding: 0;
   margin: 0;
+}
+
+:root {
+  --background-color: white;
+  --secondary-background-color: white;
+  --mainfontcolor: black;
+  --titlefontcolor: black;
+  --navfontcolor: black;
+  --hightlightcolor: #4A61DD;
+  --bordercolor: #EEE;
+  --input-bordercolor: rgba(0, 0, 0, 0.5);
+  --card-button-background: #F0F3FF;
+  --card-button-background-hover: #D8DEFF;
+  --card-button-border: none;
+  --textarea-border: 1px solid rgba(0, 0, 0, 0.5);
+  --textarea-border-focus: 1px solid #4A61DD;
+  --button-background: #DEDEDE;
+  --urlThemeIcon: url(./images/sun.png);
+}
+
+[data-theme='dark'] {
+  --background-color: #282C34;
+  --secondary-background-color: #21252B;
+  --mainfontcolor: #f1f4f7;
+  --titlefontcolor: #a5a7a8;
+  --navfontcolor: #f1f4f7;
+  --hightlightcolor: #8fb6e4;
+  --bordercolor: #c4c3c3;
+  --input-bordercolor: #c4c3c3;
+  --card-button-background: #282C34;
+  --card-button-background-hover: #303241;
+  --card-button-border: 1px solid #8fb6e4;
+  --textarea-border: 1px solid #c4c3c3;
+  --textarea-border-focus: 1.5px solid #f1f4f7;
+  --button-background: #282C34;
+  --urlThemeIcon: url(./images/moon.png);
 }

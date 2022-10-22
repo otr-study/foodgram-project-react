@@ -28,7 +28,7 @@
 
 .menuLink {
   white-space: nowrap;
-  color: #000;
+  color: var(--navfontcolor);
   background: none;
   border: none;
   cursor: pointer;

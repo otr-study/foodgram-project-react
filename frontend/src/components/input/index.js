@@ -4,22 +4,22 @@ import styles from './styles.module.css'
 import cn from 'classnames'
 
 const Input = ({
-    onChange,
-    placeholder,
-    label,
-    disabled,
-    type = 'text',
-    inputClassName,
-    labelClassName,
-    className,
-    name,
-    required,
-    onFocus,
-    onBlur,
-    value = ''
-  }) => {
+  onChange,
+  placeholder,
+  label,
+  disabled,
+  type = 'text',
+  inputClassName,
+  labelClassName,
+  className,
+  name,
+  required,
+  onFocus,
+  onBlur,
+  value = ''
+}) => {
 
-  const [ inputValue, setInputValue ] = useState(value)
+  const [inputValue, setInputValue] = useState(value)
   const handleValueChange = (e) => {
     const value = e.target.value
     setInputValue(value)
@@ -48,6 +48,7 @@ const Input = ({
         onFocus={onFocus}
         value={inputValue}
         onBlur={onBlur}
+        autocomplete='off'
       />
     </label>
   </div>
