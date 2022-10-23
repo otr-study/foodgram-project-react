@@ -66,6 +66,7 @@ body {
   --mainfontcolor: black;
   --titlefontcolor: black;
   --navfontcolor: black;
+  --invertedfontcolor: white;
   --hightlightcolor: #4A61DD;
   --bordercolor: #EEE;
   --input-bordercolor: rgba(0, 0, 0, 0.5);
@@ -84,6 +85,7 @@ body {
   --mainfontcolor: #f1f4f7;
   --titlefontcolor: #a5a7a8;
   --navfontcolor: #f1f4f7;
+  --invertedfontcolor: black;
   --hightlightcolor: #8fb6e4;
   --bordercolor: #c4c3c3;
   --input-bordercolor: #c4c3c3;
